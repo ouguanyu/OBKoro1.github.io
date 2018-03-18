@@ -373,9 +373,9 @@
       <category term="Vue" scheme="http://yoursite.com/categories/Vue/"/>
     
     
-      <category term="Vue" scheme="http://yoursite.com/tags/Vue/"/>
-    
       <category term="vue-cli配置" scheme="http://yoursite.com/tags/vue-cli%E9%85%8D%E7%BD%AE/"/>
+    
+      <category term="Vue" scheme="http://yoursite.com/tags/Vue/"/>
     
   </entry>
   
