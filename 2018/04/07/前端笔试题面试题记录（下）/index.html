@@ -81,7 +81,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/4/6/162999e3d2712c52?w=766&h=737&f=png&s=79078">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2017/12/9/1603ae858f7da6cd?imageView2/0/w/1280/h/960/format/webp/ignore-error/1">
-<meta property="og:updated_time" content="2018-04-07T13:40:09.565Z">
+<meta property="og:updated_time" content="2018-04-08T17:21:32.609Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="前端笔试题面试题记录（下）">
 <meta name="twitter:description" content="前言接上篇前端笔试题面试题记录（上）。趁清明小长假，把上篇剩下的部分也写一下，因为最近比较忙这篇已经拖了很久了。现在刚刚开始银四了，应该还是有些小伙伴在找工作，时间还不算太晚，希望本篇可以帮到这些小伙伴。  个人博客了解一下：obkoro1.com   本文主要目录如下：  面试题QA 面试遇到的一些小问题 Vue系列问题   面试题QAQ：了解ES6的let和const变量声明吗？跟ES5的va">
@@ -417,7 +417,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2,789 字
+                  2,854 字
                 </span>
               
 
@@ -433,7 +433,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  10分钟
+                  11分钟
                 </span>
               
             </div>
@@ -488,7 +488,7 @@
 （笔试题就出现过层叠的class id选择器，作用在同一个标签上，然后问最后哪个css属性生效）
 </code></pre><p>找到一篇很好的写css权重的文章，有兴趣的可以看一下。<a href="https://www.w3cplus.com/css/css-specificity-things-you-should-know.html" target="_blank" rel="external">你应该知道的一些事情——CSS权重</a></p>
 <hr>
-<h3 id="Q：继承函数对象的实力方法、原型的继承。"><a href="#Q：继承函数对象的实力方法、原型的继承。" class="headerlink" title="Q：继承函数对象的实力方法、原型的继承。"></a>Q：继承函数对象的实力方法、原型的继承。</h3><p>函数对象的继承，在面试的时候，一般出现在笔试题那边，也碰到过几次，下面给出一个答案。</p>
+<h3 id="Q：继承函数对象的实例方法、原型的继承。"><a href="#Q：继承函数对象的实例方法、原型的继承。" class="headerlink" title="Q：继承函数对象的实例方法、原型的继承。"></a>Q：继承函数对象的实例方法、原型的继承。</h3><p>函数对象的继承，在面试的时候，一般出现在笔试题那边，也碰到过几次，下面给出一个答案。</p>
 <pre><code>function father(name){//父函数
   this.name=name|&apos;koro1&apos;;
   this.code=function(){ //父类的实例方法
@@ -504,6 +504,7 @@ function son(name){ //子函数
 }
 son.prototype = new father();//把父类的原型方法绑定到子类，实现继承
 var sonVar= new son(&apos;faker&apos;);//这里也可以传参name
+son.prototype.constructor = son;//修复构造函数的指向
 console.log(sonVar.code());
 console.log(sonVar.add());//可以调用父类的方法了
 </code></pre><hr>
@@ -516,8 +517,12 @@ console.log(sonVar.add());//可以调用父类的方法了
     return num;
 }
 let reduce=(arr)=&gt;eval(arr.join(&quot;+&quot;)); //第二种 
-//join() 方法把数组元素放入字符串 上面的栗子： arr.join(&quot;+&quot;)得到字符串:&apos;3+4+8+0+9&apos;
+//join() 方法把数组元素放入字符串 上面的栗子： arr.join(&quot;+&quot;)得到字符串:&apos;3+4+8+0+9&apos;;
 // eval() 函数计算字符串 ,并执行其中的的 JavaScript 代码
+//经提醒：原来有一个reduce()数组求和的方法，把这个方法加上去
+let result=[3,4,8,0,9].reduce((total,value)=&gt;{ //这两个参数是默认参数不用设置的
+    return total+value
+});
 </code></pre><hr>
 <h3 id="Q：call-和apply-有什么区别？"><a href="#Q：call-和apply-有什么区别？" class="headerlink" title="Q：call()和apply()有什么区别？"></a>Q：call()和apply()有什么区别？</h3><p>call()和apply()第一个参数将用作函数内 this 的值,用于改变函数的this指向。call和apply的区别在于call()方法接受逗号分隔的参数作为后面的参数，apply()接受一个参数数组作为后面的参数。</p>
 <pre><code>从别的博客那边看到一个简单的记忆方法：从call中的 C 联想到逗号分隔（comma-separated），从apply中的 A 联想到数组（array）。
@@ -858,7 +863,7 @@ shift() 方法用于把数组的第一个元素从其中删除，并返回第一
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题QA"><span class="nav-number">2.</span> <span class="nav-text">面试题QA</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Q：了解ES6的let和const变量声明吗？跟ES5的var有哪些区别？"><span class="nav-number">2.1.</span> <span class="nav-text">Q：了解ES6的let和const变量声明吗？跟ES5的var有哪些区别？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#let"><span class="nav-number">2.1.1.</span> <span class="nav-text">let</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#const"><span class="nav-number">2.1.2.</span> <span class="nav-text">const</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q：Css的优先级。"><span class="nav-number">2.2.</span> <span class="nav-text">Q：Css的优先级。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q：继承函数对象的实力方法、原型的继承。"><span class="nav-number">2.3.</span> <span class="nav-text">Q：继承函数对象的实力方法、原型的继承。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q-通过reduce函数来实现简单的数组求和，示例数组-3-4-8-0-9"><span class="nav-number">2.4.</span> <span class="nav-text">Q:通过reduce函数来实现简单的数组求和，示例数组[3,4,8,0,9];</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q：call-和apply-有什么区别？"><span class="nav-number">2.5.</span> <span class="nav-text">Q：call()和apply()有什么区别？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q：position有哪些值？有什么作用？"><span class="nav-number">2.6.</span> <span class="nav-text">Q：position有哪些值？有什么作用？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q-如何实现一个闭包？闭包的作用有哪些？"><span class="nav-number">2.7.</span> <span class="nav-text">Q:如何实现一个闭包？闭包的作用有哪些？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q-请从2017-05-15T09-10-23-Europe-Paris提取出结果-quot-2017-quot-quot-05-quot-quot-15-quot-quot-09-quot-quot-10-quot-quot-23-quot"><span class="nav-number">2.8.</span> <span class="nav-text">Q:请从2017-05-15T09:10:23 Europe/Paris提取出结果["2017","05","15","09","10","23"]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q-请描述一下Promise的使用场景，’Promise’它所解决的问题以及现在对于异步操作的解决方案。"><span class="nav-number">2.9.</span> <span class="nav-text">Q:请描述一下Promise的使用场景，’Promise’它所解决的问题以及现在对于异步操作的解决方案。</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试遇到的一些小问题："><span class="nav-number">3.</span> <span class="nav-text">面试遇到的一些小问题：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#函数参数变量提升"><span class="nav-number">3.0.1.</span> <span class="nav-text">函数参数变量提升</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#js有哪些方法定义对象？"><span class="nav-number">3.0.2.</span> <span class="nav-text">js有哪些方法定义对象？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字符串数字转换运算的问题"><span class="nav-number">3.0.3.</span> <span class="nav-text">字符串数字转换运算的问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#split-、join-的区别？"><span class="nav-number">3.0.4.</span> <span class="nav-text">split()、join()的区别？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pop-push-unshift-shift-的作用？"><span class="nav-number">3.0.5.</span> <span class="nav-text">pop()push()unshift()shift()的作用？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#判断一个数是否是整数"><span class="nav-number">3.0.6.</span> <span class="nav-text">判断一个数是否是整数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何将字符串转为数字，如：12-3b？"><span class="nav-number">3.0.7.</span> <span class="nav-text">如何将字符串转为数字，如：12.3b？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是外边距合并？"><span class="nav-number">3.0.8.</span> <span class="nav-text">什么是外边距合并？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Q-你常用的git-svn-命令行有哪些？行内元素有哪些，块状元素有哪些？css有哪些选择器？"><span class="nav-number">3.0.9.</span> <span class="nav-text">Q:你常用的git/svn 命令行有哪些？行内元素有哪些，块状元素有哪些？css有哪些选择器？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vue系列问题："><span class="nav-number">4.</span> <span class="nav-text">Vue系列问题：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#以下是笔试真题："><span class="nav-number">4.1.</span> <span class="nav-text">以下是笔试真题：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考链接："><span class="nav-number">5.1.</span> <span class="nav-text">参考链接：</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试题QA"><span class="nav-number">2.</span> <span class="nav-text">面试题QA</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Q：了解ES6的let和const变量声明吗？跟ES5的var有哪些区别？"><span class="nav-number">2.1.</span> <span class="nav-text">Q：了解ES6的let和const变量声明吗？跟ES5的var有哪些区别？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#let"><span class="nav-number">2.1.1.</span> <span class="nav-text">let</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#const"><span class="nav-number">2.1.2.</span> <span class="nav-text">const</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q：Css的优先级。"><span class="nav-number">2.2.</span> <span class="nav-text">Q：Css的优先级。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q：继承函数对象的实例方法、原型的继承。"><span class="nav-number">2.3.</span> <span class="nav-text">Q：继承函数对象的实例方法、原型的继承。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q-通过reduce函数来实现简单的数组求和，示例数组-3-4-8-0-9"><span class="nav-number">2.4.</span> <span class="nav-text">Q:通过reduce函数来实现简单的数组求和，示例数组[3,4,8,0,9];</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q：call-和apply-有什么区别？"><span class="nav-number">2.5.</span> <span class="nav-text">Q：call()和apply()有什么区别？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q：position有哪些值？有什么作用？"><span class="nav-number">2.6.</span> <span class="nav-text">Q：position有哪些值？有什么作用？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q-如何实现一个闭包？闭包的作用有哪些？"><span class="nav-number">2.7.</span> <span class="nav-text">Q:如何实现一个闭包？闭包的作用有哪些？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q-请从2017-05-15T09-10-23-Europe-Paris提取出结果-quot-2017-quot-quot-05-quot-quot-15-quot-quot-09-quot-quot-10-quot-quot-23-quot"><span class="nav-number">2.8.</span> <span class="nav-text">Q:请从2017-05-15T09:10:23 Europe/Paris提取出结果["2017","05","15","09","10","23"]</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q-请描述一下Promise的使用场景，’Promise’它所解决的问题以及现在对于异步操作的解决方案。"><span class="nav-number">2.9.</span> <span class="nav-text">Q:请描述一下Promise的使用场景，’Promise’它所解决的问题以及现在对于异步操作的解决方案。</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面试遇到的一些小问题："><span class="nav-number">3.</span> <span class="nav-text">面试遇到的一些小问题：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#函数参数变量提升"><span class="nav-number">3.0.1.</span> <span class="nav-text">函数参数变量提升</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#js有哪些方法定义对象？"><span class="nav-number">3.0.2.</span> <span class="nav-text">js有哪些方法定义对象？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字符串数字转换运算的问题"><span class="nav-number">3.0.3.</span> <span class="nav-text">字符串数字转换运算的问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#split-、join-的区别？"><span class="nav-number">3.0.4.</span> <span class="nav-text">split()、join()的区别？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pop-push-unshift-shift-的作用？"><span class="nav-number">3.0.5.</span> <span class="nav-text">pop()push()unshift()shift()的作用？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#判断一个数是否是整数"><span class="nav-number">3.0.6.</span> <span class="nav-text">判断一个数是否是整数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何将字符串转为数字，如：12-3b？"><span class="nav-number">3.0.7.</span> <span class="nav-text">如何将字符串转为数字，如：12.3b？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是外边距合并？"><span class="nav-number">3.0.8.</span> <span class="nav-text">什么是外边距合并？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Q-你常用的git-svn-命令行有哪些？行内元素有哪些，块状元素有哪些？css有哪些选择器？"><span class="nav-number">3.0.9.</span> <span class="nav-text">Q:你常用的git/svn 命令行有哪些？行内元素有哪些，块状元素有哪些？css有哪些选择器？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Vue系列问题："><span class="nav-number">4.</span> <span class="nav-text">Vue系列问题：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#以下是笔试真题："><span class="nav-number">4.1.</span> <span class="nav-text">以下是笔试真题：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考链接："><span class="nav-number">5.1.</span> <span class="nav-text">参考链接：</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -896,7 +901,7 @@ shift() 方法用于把数组的第一个元素从其中删除，并返回第一
       <span class="post-meta-item-text">Site words total count&#58;</span>
     
     <span title="Site words total count">
-      75.8k
+      75.9k
     </span>
   
 </div>
