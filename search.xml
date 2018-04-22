@@ -3,6 +3,215 @@
   
     
     <entry>
+      <title><![CDATA[论如何用Vue实现一个弹窗-一个简单的组件实现]]></title>
+      <url>/2018/04/22/%E8%AE%BA%E5%A6%82%E4%BD%95%E7%94%A8Vue%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E5%BC%B9%E7%AA%97-%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E7%BB%84%E4%BB%B6%E5%AE%9E%E7%8E%B0/</url>
+      <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在使用element-ui框架，用到了Dialog对话框组件，大致实现的效果，跟我之前自己在移动端项目里面弄的一个弹窗组件差不太多。然后就想着把这种弹窗组件的实现方式与大家分享一下，下面本文会带着大家手摸手实现一个弹窗组件。</p>
+<p>本文主要内容会涉及到弹窗遮罩的实现，<code>slot</code>插槽的使用方式，<code>props</code>、<code>$emit</code>传参，具体组件代码也传上去了。如果喜欢的话可以点波赞/关注，支持一下，希望大家看完本文可以有所收获。</p>
+<blockquote>
+<p>个人博客了解一下：<a href="http://obkoro1.com/" target="_blank" rel="external">obkoro1.com</a></p>
+</blockquote>
+<hr>
+<h3 id="组件最后实现的效果"><a href="#组件最后实现的效果" class="headerlink" title="组件最后实现的效果"></a>组件最后实现的效果</h3><p><img src="https://user-gold-cdn.xitu.io/2018/4/21/162e6f9251c7c18f?w=650&amp;h=1141&amp;f=png&amp;s=374719" alt=""></p>
+<h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><ol>
+<li>先搭建组件的html和css样式，遮罩层和内容层。</li>
+<li>定制弹窗内容：弹窗组件通过<code>slot</code>插槽接受从父组件那里传过来弹窗内容。</li>
+<li>定制弹窗样式：弹窗组件通过<code>props</code>接收从父组件传过来的弹窗宽度，上下左右的位置。</li>
+<li>组件开关：通过父组件传进来的<code>props</code>控制组件的显示与隐藏，子组件关闭时通过事件<code>$emit</code>触发父组件改变值。</li>
+</ol>
+<hr>
+<h3 id="1-搭建组件的html和css样式。"><a href="#1-搭建组件的html和css样式。" class="headerlink" title="1.搭建组件的html和css样式。"></a>1.搭建组件的html和css样式。</h3><p>html结构：一层遮罩层，一层内容层，内容层里面又有一个头部title和主体内容和一个关闭按钮。</p>
+<p>下面是组件中的html结构，里面有一些后面才要加进去的东西，如果看不懂的话可以先跳过，</p>
+<pre><code> &lt;template&gt;
+  &lt;div class=&quot;dialog&quot;&gt;
+      &lt;!--外层的遮罩 点击事件用来关闭弹窗，isShow控制弹窗显示 隐藏的props--&gt;
+      &lt;div class=&quot;dialog-cover back&quot;  v-if=&quot;isShow&quot;  @click=&quot;closeMyself&quot;&gt;&lt;/div&gt;
+      &lt;!-- transition 这里可以加一些简单的动画效果 --&gt;
+      &lt;transition name=&quot;drop&quot;&gt;
+         &lt;!--style 通过props 控制内容的样式  --&gt;
+        &lt;div class=&quot;dialog-content&quot; :style=&quot;{top:topDistance+&apos;%&apos;,width:widNum+&apos;%&apos;,left:leftSite+&apos;%&apos;}&quot;  v-if=&quot;isShow&quot;&gt;
+          &lt;div class=&quot;dialog_head back&quot;&gt;
+             &lt;!--弹窗头部 title--&gt;
+              &lt;slot name=&quot;header&quot;&gt;提示信息&lt;/slot&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;dialog_main&quot; :style=&quot;{paddingTop:pdt+&apos;px&apos;,paddingBottom:pdb+&apos;px&apos;}&quot;&gt;
+            &lt;!--弹窗的内容--&gt;
+            &lt;slot name=&quot;main&quot;&gt;弹窗内容&lt;/slot&gt;
+          &lt;/div&gt;
+          &lt;!--弹窗关闭按钮--&gt;
+          &lt;div  class=&quot;foot_close&quot; @click=&quot;closeMyself&quot;&gt;
+              &lt;div class=&quot;close_img back&quot;&gt;&lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/transition&gt;
+  &lt;/div&gt;
+&lt;/template&gt; 
+</code></pre><p>下面是组件中的主要的css样式，里面都做了充分的注释，主要通过<code>z-index</code>和<code>background</code>达到遮罩的效果，具体内容的css可以根据自己的需求来设置。</p>
+<pre><code>&lt;style lang=&quot;scss&quot; scoped&gt;
+ // 最外层 设置position定位 
+  .dialog {
+    position: relative;
+    color: #2e2c2d;
+    font-size: 16px;
+  }
+  // 遮罩 设置背景层，z-index值要足够大确保能覆盖，高度 宽度设置满 做到全屏遮罩
+  .dialog-cover {
+    background: rgba(0,0,0, 0.8);
+    position: fixed;
+    z-index: 200;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  // 内容层 z-index要比遮罩大，否则会被遮盖，
+  .dialog-content{
+    position: fixed;
+    top: 35%;
+    // 移动端使用felx布局 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+ }
+&lt;/style&gt;
+</code></pre><hr>
+<h3 id="2-通过slot定制弹窗内容"><a href="#2-通过slot定制弹窗内容" class="headerlink" title="2. 通过slot定制弹窗内容"></a>2. 通过<code>slot</code>定制弹窗内容</h3><p>这一步，只要理解了<code>slot</code>的作用以及用法，就没有问题了。</p>
+<h4 id="单个插槽："><a href="#单个插槽：" class="headerlink" title="单个插槽："></a>单个插槽：</h4><pre><code>&lt;slot&gt;这是在没有slot传进来的时候，才显示的弹窗内容&lt;/slot&gt;
+</code></pre><p> 上面是单个插槽也叫默认插槽，在父组件中使用插槽的正确姿势：</p>
+<pre><code> &lt;my-component&gt;
+ &lt;!--在my-component里面的所有内容片段都将插入到slot所在的DOM位置，并且会替换掉slot标签--&gt;
+ &lt;!--这两个p标签，将替换整个slot标签里面的内容--&gt;
+  &lt;p&gt;这是一些初始内容&lt;/p&gt;
+  &lt;p&gt;这是更多的初始内容&lt;/p&gt;
+&lt;/my-component&gt;
+</code></pre><p>ps:如果子组件里面包含<code>slot</code>插槽，那么上面的p标签的内容将会被丢弃。</p>
+<h4 id="具名插槽："><a href="#具名插槽：" class="headerlink" title="具名插槽："></a>具名插槽：</h4><p> 所谓的具名插槽，即为<code>slot</code>标签赋一个<code>name</code>属性，具名插槽可以父组件中不同的内容片段放到子组件的不同地方，具名插槽还是可以拥有一个默认插槽。下面可以看一下弹窗组件插槽的使用方式：</p>
+<pre><code>&lt;div class=&quot;dialog_head back &quot;&gt;
+  &lt;!--弹窗头部 title--&gt;
+  &lt;slot name=&quot;header&quot;&gt;提示信息&lt;/slot&gt;
+ &lt;/div&gt;
+ &lt;div class=&quot;dialog_main &quot; :style=&quot;{paddingTop:pdt+&apos;px&apos;,paddingBottom:pdb+&apos;px&apos;}&quot;&gt;
+    &lt;!--弹窗的内容--&gt;
+    &lt;slot name=&quot;main&quot;&gt;弹窗内容&lt;/slot&gt;
+ &lt;/div&gt;
+</code></pre><p>在父组件中的使用方式：</p>
+<ol>
+<li>将弹窗组件引入要使用的组件中，并通过<code>components</code>注册成为组件。</li>
+<li><p>父组件中弹窗组件插槽的使用方法如下。</p>
+<pre><code>&lt;dialogComponent&gt;
+
+    &lt;div slot=&quot;header&quot;&gt;插入到name为header的slot标签里面&lt;/div&gt;
+     &lt;div class=&quot;dialog_publish_main&quot; slot=&quot;main&quot;&gt;
+        这里是内容插入到子组件的slot的name为main里面，可以在父组件中添加class定义样式，事件类型等各种操作
+     &lt;/div&gt;
+&lt;/dialogComponent&gt;
+</code></pre></li>
+</ol>
+<p>关于组件中用到的插槽的介绍就到这里了，插槽在弹窗组件中的应用是一个典型的栗子，可以看到插槽作用相当强大，而插槽本身的使用并不难，同学们爱上插槽了没有？</p>
+<hr>
+<h3 id="3-通过props控制弹窗显隐-amp-amp-定制弹窗style"><a href="#3-通过props控制弹窗显隐-amp-amp-定制弹窗style" class="headerlink" title="3.通过props控制弹窗显隐&amp;&amp;定制弹窗style"></a>3.通过<code>props</code>控制弹窗显隐&amp;&amp;定制弹窗style</h3><p> <code>psops</code>是Vue中父组件向子组件传递数据的一种方式，不熟悉的小伙伴们可以看一下<a href="https://cn.vuejs.org/v2/guide/components.html#Prop" target="_blank" rel="external">props文档</a>。</p>
+<p>  因为弹窗组件都是引到别的组件里面去用的，为了适合不同组件场景中的弹窗，所以弹窗组件必须具备一定的可定制性，否则这样的组件将毫无意义,下面介绍一下props的使用方式，以弹窗组件为例：</p>
+<ol>
+<li>首先需要在被传入的组件中定义props的一些特性，验证之类的。</li>
+<li><p>然后在父组件中绑定props数据。</p>
+<pre><code> &lt;script&gt;
+export default {
+  props: {
+    isShow: { 
+    //弹窗组件是否显示 默认不显示
+      type: Boolean,
+      default: false,
+      required:true, //必须
+    },
+    //下面这些属性会绑定到div上面 详情参照上面的html结构
+    // 如： :style=&quot;{top:topDistance+&apos;%&apos;,width:widNum+&apos;%&apos;}&quot;
+    widNum:{ 
+    //内容宽度
+      type: Number,
+      default:86.5
+    },
+    leftSite:{
+      // 左定位
+      type: Number,
+      default:6.5
+    },
+    topDistance: {
+        //top上边距
+      type: Number,
+      default:35
+    },
+    pdt:{
+      //上padding
+      type: Number,
+      default:22
+    },
+    pdb:{
+      //下padding
+      type: Number,
+      default:47
+    }
+  },
+}
+&lt;/script&gt;
+</code></pre></li>
+</ol>
+<p>父组件中使用方式：</p>
+<pre><code>&lt;dialogComponent :is-show=&quot;status.isShowPublish&quot; :top-distance=&quot;status.topNum&quot;&gt;
+&lt;/dialogComponent&gt;
+</code></pre><p> ps：props传递数据不是双向绑定的，而是<strong>单向数据流</strong>，父组件的数据变化时，也会传递到子组件中，这就意外着我们不应该在子组件中修改props。所以我们在关闭弹窗的时候就<strong>需要通过<code>$emit</code>来修改父组件的数据</strong>，然后数据会自动传到子组件中。</p>
+<p>现在基本上弹窗组件都已实现的差不多了，还差一个弹窗的关闭事件，这里就涉及到子组件往父组件传参了。</p>
+<h3 id="4-emit触发父组件事件修改数据，关闭弹窗"><a href="#4-emit触发父组件事件修改数据，关闭弹窗" class="headerlink" title="4.$emit触发父组件事件修改数据，关闭弹窗"></a>4.<code>$emit</code>触发父组件事件修改数据，关闭弹窗</h3><p>Vue中在子组件往父组件传参，很多都是通过<code>$emit</code>来触发父组件的事件来修改数据。</p>
+<p>在子组件中，在点击关闭，或者遮罩层的时候触发下面这个方法：</p>
+<pre><code>methods: {
+    closeMyself() {
+      this.$emit(&quot;on-close&quot;); 
+      //如果需要传参的话，可以在&quot;on-close&quot;后面再加参数，然后在父组件的函数里接收就可以了。
+    }
+  } 
+</code></pre><p>父组件中的写法：</p>
+<pre><code>  &lt;dialogComponent :is-show=&quot;status.isShowPublish&quot; :top-distance=&quot;status.topNum&quot;  @on-close=&quot;closeDialog&quot;&gt; 
+  &lt;/dialogComponent&gt;
+  //&quot;on-close是监听子组件的时间有没有触发，触发的时候执行closeDialog函数
+methods:{
+  closeDialog(){
+    // this.status.isShowPublish=false;
+    //把绑定的弹窗数组 设为false即可关闭弹窗
+  },
+}
+</code></pre><hr>
+<p>可以用弹窗组件实现下列这种信息展示，或者事件交互：</p>
+<p> <img src="https://user-gold-cdn.xitu.io/2018/4/21/162e7a7af2e0effa?w=402&amp;h=728&amp;f=png&amp;s=140506" alt=""></p>
+<h3 id="弹窗组件代码"><a href="#弹窗组件代码" class="headerlink" title="弹窗组件代码"></a><a href="https://github.com/OBKoro1/simpleDemo/blob/master/dialogComponent.vue" target="_blank" rel="external">弹窗组件代码</a></h3><p>上面是把弹窗的每个步骤拆分开来，一步步解析的，每一步都说的比较清楚了，具体连起来的话，可以看看<a href="https://github.com/OBKoro1/simpleDemo/blob/master/dialogComponent.vue" target="_blank" rel="external">代码</a>，再结合文章就能理的很清楚了。</p>
+<h2 id="小结："><a href="#小结：" class="headerlink" title="小结："></a>小结：</h2><p>这个弹窗组件，实现起来一点都不难，我这里主要是提供了一个实现方式，当项目中有需要的话，大家也可以自己撸一个出来，以上就是本文的内容了，希望同学们看完能有所收获。</p>
+<h3 id="希望看完的朋友可以点个喜欢，也可以关注一下我，您的支持是对我最大的鼓励。"><a href="#希望看完的朋友可以点个喜欢，也可以关注一下我，您的支持是对我最大的鼓励。" class="headerlink" title="希望看完的朋友可以点个喜欢，也可以关注一下我，您的支持是对我最大的鼓励。"></a>希望看完的朋友可以点个喜欢，也可以关注一下我，您的支持是对我最大的鼓励。</h3><p><strong>最后</strong>：如需转载，请放上原文链接并署名。码字不易，<strong>感谢</strong>支持！本人写文章本着交流记录的心态，写的不好之处，不撕逼，但是欢迎指点。</p>
+<p><strong><a href="http://obkoro1.com/" target="_blank" rel="external">个人blog</a></strong> and <strong><a href="https://juejin.im/user/58714f0eb123db4a2eb95372" target="_blank" rel="external">掘金个人主页</a></strong>  </p>
+<p> 以上2018.4.21</p>
+<h3 id="参考资料："><a href="#参考资料：" class="headerlink" title="参考资料："></a>参考资料：</h3><p><a href="https://cn.vuejs.org/v2/guide/components.html#%E4%BD%BF%E7%94%A8%E6%8F%92%E6%A7%BD%E5%88%86%E5%8F%91%E5%86%85%E5%AE%B9" target="_blank" rel="external">Vue文档-插槽</a></p>
+]]></content>
+      
+        <categories>
+            
+            <category> Vue </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> Vue </tag>
+            
+            <tag> css </tag>
+            
+            <tag> js </tag>
+            
+            <tag> 组件 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[前端笔试题面试题记录（下）]]></title>
       <url>/2018/04/07/%E5%89%8D%E7%AB%AF%E7%AC%94%E8%AF%95%E9%A2%98%E9%9D%A2%E8%AF%95%E9%A2%98%E8%AE%B0%E5%BD%95%EF%BC%88%E4%B8%8B%EF%BC%89/</url>
       <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>接上篇<a href="https://juejin.im/post/5aad40e4f265da237f1e12ed" target="_blank" rel="external">前端笔试题面试题记录（上）</a>。趁清明小长假，把上篇剩下的部分也写一下，因为最近比较忙这篇已经拖了很久了。现在刚刚开始银四了，应该还是有些小伙伴在找工作，时间还不算太晚，希望本篇可以帮到这些小伙伴。</p>
